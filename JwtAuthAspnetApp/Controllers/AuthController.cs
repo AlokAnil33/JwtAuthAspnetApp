@@ -1,4 +1,5 @@
 ﻿using JwtAuthAspnetApp.Core.DataModel;
+using JwtAuthAspnetApp.Core.Entities;
 using JwtAuthAspnetApp.Core.OtherObjects;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,11 @@ namespace JwtAuthAspnetApp.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration configuration;
 
-        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -53,8 +54,10 @@ namespace JwtAuthAspnetApp.Controllers
             var isExistUser = await userManager.FindByNameAsync(registerModel.UserName);
             if (isExistUser != null)
                 return BadRequest("UserName already exists");
-            IdentityUser newUser = new IdentityUser()
+            ApplicationUser newUser = new ApplicationUser()
             {
+                FirstName = registerModel.FirstName,
+                LastName = registerModel.LastName,
                 Email = registerModel.EMail,
                 UserName = registerModel.UserName,
                 SecurityStamp = Guid.NewGuid().ToString(),
@@ -91,7 +94,9 @@ namespace JwtAuthAspnetApp.Controllers
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim("JWTID", Guid.NewGuid().ToString())
+                new Claim("JWTID", Guid.NewGuid().ToString()),
+                new Claim("FirstName",user.FirstName),
+                new Claim("LastName",user.LastName)
             };
             foreach (var userRole in userRoles)
             {
