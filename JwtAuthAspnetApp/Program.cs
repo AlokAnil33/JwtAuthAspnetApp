@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using JwtAuthAspnetApp.Core.DBContext;
 using JwtAuthAspnetApp.Core.Entities;
+using JwtAuthAspnetApp.Core.Interfaces;
+using JwtAuthAspnetApp.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +62,9 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
         };
     });
+
+//Inject dependencies
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
